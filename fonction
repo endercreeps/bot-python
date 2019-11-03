@@ -1,0 +1,37 @@
+import time
+import discord
+import asyncio
+import aiohttp
+import json
+from discord import Game
+from discord.ext.commands import *
+from random import *
+from discord.ext import commands 
+from itertools import cycle
+import os
+from discord.ext.commands import Bot
+from discord.voice_client import VoiceClient
+import urllib.parse, urllib.request, re
+import random
+
+x = 2
+
+def get_prefix(client,message):
+    with open('prefixes.json', 'r')as f:
+        prefixes = json.load(f)
+
+    return prefixes[str(message.guild.id)]
+
+client = commands.Bot(command_prefix=get_prefix)
+TOKEN = 'NTkwMjIzNjQ5ODE1MDAzMjAx.XQfGtA.fgsSs-kI2xcpGppxEMgb7pgtj-E'
+extensions = ['fun']
+client.remove_command("help")
+os.chdir(r'C:\Users\coren\Documents\Bot resolve\PythonApplication1\PythonApplication1')
+i = 0
+
+with open('reports.json', encoding='utf-8') as f:
+  try:
+    report = json.load(f)
+  except ValueError:
+    report = {}
+    report['users'] = []
