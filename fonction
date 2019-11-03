@@ -23,7 +23,7 @@ def get_prefix(client,message):
     return prefixes[str(message.guild.id)]
 
 client = commands.Bot(command_prefix=get_prefix)
-TOKEN = 'NTkwMjIzNjQ5ODE1MDAzMjAx.XQfGtA.fgsSs-kI2xcpGppxEMgb7pgtj-E'
+TOKEN = '#contact ender_creeps#4934'
 extensions = ['fun']
 client.remove_command("help")
 os.chdir(r'C:\Users\coren\Documents\Bot resolve\PythonApplication1\PythonApplication1')
