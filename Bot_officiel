@@ -1,0 +1,190 @@
+from fonction import *
+from administration import *
+
+
+@client.event
+async def on_ready():
+    print(f"{client.user.name} se lance")
+    await client.change_presence(status=discord.Status.idle, activity=discord.Game("protéger mes serveurs | ,help"))
+    #await client.change_presence(game=Game(name="test"))
+
+@client.event
+async def on_member_join(member):
+    channel = discord.utils.get(member.guild.channels, name="‹🐾›-welcome")
+    #channel_règle = discord.utils.get(member.guild.channels, name="📰-règles")
+    await channel.send(f"**Bienvenue** {member.mention} :tada::wave:   **Bienvenue sur le serveur !!!**")
+    await user.create_dm()
+    await user.dm_channel.send(f"**Bienvenue** {member.mention} **Bienvenue sur le serveur !!! Pense a regarder les règles et a cocher la réaction pour avoir accès au reste du serveur  ;)**  ")
+    print("Une personne est arrivé")
+
+@client.event
+async def on_member_remove(member):
+    channel = discord.utils.get(member.guild.channels, name="‹🐾›-welcome")
+    await channel.send(f"{member.mention}**a quitté le serveur :cry: aurevoir !**")
+    print("Une personne est partie")
+
+@client.event
+async def on_guild_join(guild):
+    with open('prefixes.json', 'r')as f:
+        prefixes = json.load(f)
+
+    prefixes[str(guild.id)] = ','
+    with open('prefixes.json', 'w')as f:
+        json.dump(prefixes, f, indent=4)
+  
+
+@client.event
+async def on_guild_remove(guild):
+    with open('prefixes.json', 'r')as f:
+        prefixes = json.load(f)
+
+    prefixes.pop[str(guild.id)]
+    with open('prefixes.json', 'w')as f:
+        json.dump(prefixes, f, indent=4)
+
+
+@client.command()
+@commands.has_permissions(administrator=True)
+async def changeprefix(ctx, prefix):
+    with open('prefixes.json', 'r')as f:
+        prefixes = json.load(f)
+  
+    prefixes[str(ctx.guild.id)] = prefix
+
+    with open('prefixes.json', 'w')as f:
+        json.dump(prefixes, f, indent=4)
+
+    await ctx.send(f"**Mon préfix a bien été changé en : {prefix}**")
+
+@client.command()
+async def help(ctx, member: discord.Member=None):
+    await ctx.channel.purge(limit=1)
+    author = ctx.author.mention
+
+    embed = discord.Embed(title="Help",description="Commande d'aide", colour=discord.Color.dark_blue())
+
+    embed.add_field(name="``,ping``", value="Permet de vérifier si le bot est connecté ou non")
+    embed.add_field(name="``,serveur``", value="Affiche des information sur le serveur")
+    embed.add_field(name="``,8ball``", value="Posez une question au bot et il vous répondra par oui ou par non")
+    embed.add_field(name="``,addition``", value="Effectue une addition de 2 nombres")
+    embed.add_field(name="``,soustraction``", value="Effectue une soustraction de 2 nombres")
+    embed.add_field(name="``,multiplication``", value="Effectue une multiplication de 2 nombres")
+    embed.add_field(name="``,division``", value="Effectue une division de 2 nombres")
+    embed.add_field(name="**Commande de modération**", value="Commande accesible uniquement pour les modérateurs du serveur")
+    embed.add_field(name="``,kick``", value="Exclue une personne du serveur")
+    embed.add_field(name="``,ban``", value="Ban une personne  du serveur")
+    embed.add_field(name="``,mute``", value="Empéche un membre de parler")
+    embed.add_field(name="``,unmute``", value="Le membre qui c'est pris un mute peux maintenant re-parler dans le serveur")
+    embed.add_field(name="``,clear``", value="Permet de supprimer **5 messages**")
+    embed.add_field(name="``,warn``", value="Avertis un utilisateur")
+    embed.add_field(name="``,warnings``", value="Affiche le nombre et le/les raison(s) du/des warn(s) d'un utilisateurs (si il n'en a pas cela affiche que cette utilisateur n'a pas d'utilisateur")
+    embed.add_field(name="``,changeprefix``", value="Permet de changer mon préfix (Au départ, c'ets la virgule (``,``))")
+    embed.add_field(name="``,logout``", value="Permet d'éteindre le bot /!\ ender_creeps#4934 est le seul a pouvoir le faire")
+    await ctx.send(author, embed=embed)
+
+@client.command(pass_context=True)
+@commands.has_role('14062005#4934')
+async def logout(ctx, member: discord.Member=None):
+    await ctx.send("**Extinction du bot dans 5 secondes**")
+    await asyncio.sleep(5)
+    await ctx.send("**Bot éteint**")
+    await asyncio.sleep(1)
+    await client.logout()
+
+@client.command()
+async def ping(ctx, member: discord.Member=None):
+    await ctx.channel.purge(limit=1)
+    author = ctx.author.mention
+    embed = discord.Embed(colour=discord.Color.dark_blue())
+    embed.add_field(name="Ping ?", value="Pong :ping_pong:")
+    embed.add_field(name="Latence en ms :", value=(client.latency * 1000))
+    await ctx.send(author, embed=embed)
+
+@client.command(name='8ball',
+                description="Répond a une question par oui ou par non",
+                aliases=['eight_ball', 'eightball', '8-ball'],
+                pass_context=True)
+async def eight_ball(ctx):
+    possible_responses = [
+        "C'est un non retentissant",
+        "Ce n'est pas probable",
+        'Trop difficile a dire',
+        "C'est possible",
+        "Définitivement",
+        "Je ne pense pas",
+        "Bien sur",
+        "Certainement pas",
+        "Je ne peux pas le prédire ",
+        "Mes sources disent que non",
+        "Ma réponse est non",
+        "Concentrer-vous et reposez-moi une question ",
+        "Oui, définitivement",
+        "Demandez-moi plus tard",
+        "Essaiez encore une fois pour voir ?",
+        "Aucun doute possible",
+        "Je pense que oui",
+    ] 
+    await ctx.send(random.choice(possible_responses) + ", " + ctx.message.author.mention)
+
+@client.command()
+async def serveur(ctx):
+    embed = discord.Embed(title=f"{ctx.guild.name}", color=discord.Color.blue())
+    embed.add_field(name="**Serveur créer le :**", value=f"``{ctx.guild.created_at}``")
+    embed.add_field(name="**Chef du serveur :**", value=f"``{ctx.guild.owner}``")
+    embed.add_field(name="**Region du serveur :**", value=f"``{ctx.guild.region}``")
+    embed.add_field(name="**Id du serveur :**", value=f"``{ctx.guild.id}``")
+    embed.add_field(name="**Nombre de personne sur le serveur :**", value=f"``{len(ctx.guild.members)}``")
+    embed.add_field(name="**Nombre de roles sur le serveur :**", value=f"``{len(ctx.guild.roles)}``")
+    #embed.add_field(name="**Role du serveur :**", value=f"``{ctx.guild.roles}``")
+    #embed.set_thumbnail(url=f"ctx.guild.icon_url")
+    await ctx.send(embed=embed)
+
+@client.command()
+async def invite(ctx):
+    await ctx.send("**Tu veux m'inviter dans ton serveur ? voila le lien** ;)")
+    await ctx.send("https://discordapp.com/oauth2/authorize?client_id=590223649815003201&scope=bot&permissions=8")
+
+@client.command()
+async def youtube(ctx, *, search):
+    query_string = urllib.parse.urlencode({
+        'search query': search
+        })
+    htm_content = urllib.request.urlopen(
+        'http://www.youtube.com/results?' + query_string
+         )
+    search_result = re.findall('href=\"\\/watch\\?v=(.{11})', htm_content.read().decode())
+    await ctx.send('http://www.youtube.com/watch?v=' + search_result[0])
+    print("http://www.youtube.com/watch?v=" + search_result[0])
+
+@client.command()
+async def multiplication(ctx, num1: int, num2: int):
+    #result = num1 * num2
+    embed = discord.Embed(title="Multiplication", colour=discord.Color.dark_blue())
+    embed.add_field(name="**Calcul**", value=f"``{num1} x {num2}``")
+    embed.add_field(name="**Résultat**", value=f"``{num1 * num2}``")
+    await ctx.send(embed = embed)
+
+@client.command()
+async def division(ctx, num1: int, num2: int):
+    embed = discord.Embed(title="Division", colour=discord.Color.dark_blue())
+    embed.add_field(name="**Calcul**", value=f"``{num1} ÷ {num2}``")
+    embed.add_field(name="**Résultat**", value=f"``{num1 / num2}``")
+    await ctx.send(embed = embed)
+
+@client.command()
+async def soustraction(ctx, num1: int, num2: int):
+    embed = discord.Embed(title="Soustraction", colour=discord.Color.dark_blue())
+    embed.add_field(name="**Calcul**", value=f"``{num1} - {num2}``")
+    embed.add_field(name="**Résultat**", value=f"``{num1 - num2}``")
+    await ctx.send(embed = embed)
+
+@client.command()
+async def addition(ctx, num1: int, num2: int):
+    #result = num1 * num2
+    embed = discord.Embed(title="Addition", colour=discord.Color.dark_blue())
+    embed.add_field(name="**Calcul**", value=f"``{num1} + {num2}``")
+    embed.add_field(name="**Résultat**", value=f"``{num1 + num2}``")
+    await ctx.send(embed = embed)
+    
+client.run(TOKEN)
+   
