@@ -11,14 +11,14 @@ async def kick(ctx, member: discord.Member, *, reason="Pas de raison"):
         await ctx.send("**Merci de donner le nom de l'utilisateur**")
         return
     await member.kick(reason=reason)
-    embed = discord.Embed(title="Ban", colour=000000)
+    embed = discord.Embed(title="Kick", colour=000000)
     embed.add_field(name=f"Vicime :", value=(qui))
-    embed.add_field(name=f"Raison du ban : {reason}", value=(reason))
-    embed.add_field(name=f"Par {ctx.author.name}:", value=(par))
-    await channel.send(embed=embed)
+    embed.add_field(name=f"Raison du kick :", value=(reason))
+    embed.add_field(name=f"Par:", value=(par))
+    #await ctx.channel.send(embed=embed)
     await ctx.send(embed=embed)
-    await member.create_dm()
-    await member.dm_channel.send(embed=embed)
+    await ctx.create_dm()
+    await ctx.dm_channel.send(embed=embed)
     print("Une personne a été kick")
 
 @client.command()
@@ -36,7 +36,6 @@ async def ban(ctx, member: discord.Member, *, reason="Pas de raison"):
     embed.add_field(name=f"Vicime :", value=(qui))
     embed.add_field(name=f"Raison du ban :", value=(reason))
     embed.add_field(name=f"Par :", value=(par))
-    #await channel.send(embed=embed)
     await ctx.send(embed=embed)
     await member.create_dm()
     await member.dm_channel.send(embed=embed)
@@ -58,7 +57,6 @@ async def mute(ctx, member: discord.Member, *, reason="Pas de raison"):
     embed.add_field(name=f"Vicime :", value=(qui))
     embed.add_field(name=f"Raison du mute :", value=(reason))
     embed.add_field(name=f"Par :", value=(par))
-    #await channel.send(embed=embed)
     await ctx.send(embed=embed)
     await member.create_dm()
     await member.dm_channel.send(embed=embed)
@@ -79,24 +77,23 @@ async def unmute(ctx, member: discord.Member=None):
     embed = discord.Embed(title="Unmute", colour=000000)
     embed.add_field(name=f"Vicime :", value=(qui))
     embed.add_field(name=f"Mute enlevé par :", value=(par))
-    await channel.send(embed=embed)
     await ctx.send(embed=embed)
     await member.create_dm()
     await member.dm_channel.send(embed=embed)
     print("Une personne a été unmute")
 
+
 @client.command()
 @commands.has_permissions(manage_messages=True)
-async def clear(ctx, amount=5):
+async def clear(ctx, amount: int):
     await ctx.channel.purge(limit=1)
     await ctx.channel.purge(limit=amount)
     embed = discord.Embed(title="Clear", colour=000000)
-    embed.add_field(name="Nombre de messages supprimés", value="**5**")
+    embed.add_field(name="Nombre de messages supprimés", value= amount)
     await ctx.send(embed=embed)
-    print("Des messages on été suprimés")
-    time.sleep(5)
+    time.sleep(2)
     await ctx.channel.purge(limit=1)
-
+    print("Des messages on été suprimés")
 
 @client.command(pass_context = True)
 async def warnings(ctx,user:discord.User):
@@ -109,10 +106,11 @@ async def warnings(ctx,user:discord.User):
         await ctx.send(f"```{user.name} n'a jamais été warn```")
 
 @client.command(pass_context = True)
-@has_permissions(manage_roles=True, ban_members=True)
-async def warn(ctx,user:discord.User,*reason:str):
+@has_permissions(manage_roles=True, kick_members=True)
+async def warn(ctx, id:discord.User,*reason:str):
   await ctx.channel.purge(limit=1)
   par = ctx.author.name
+  guild = ctx.message.guild
   if not reason:
     await client.say("**Merci de mettre une raison**")
     return
@@ -128,12 +126,25 @@ async def warn(ctx,user:discord.User,*reason:str):
     })
   with open('reports.json','w+') as f:
     json.dump(report,f)
-    await ctx.send(f"**{user.mention} a été warn pour : [{reason}]**")
-    #await channel.send(f"{user.mention} ** a été warn pour : [{reason}]**")
+    await ctx.send(f"**{user.mention} a été warn par {par} pour : [{reason}]**")
+    #await ctx.channel.send(f"{user.mention} ** a été warn pour : [{reason}]**")
     await user.create_dm()
-    await user.dm_channel.send(f"**Hey** {user.mention} **! Vous vous êtes warn :0 pour :** {reason} ")
+    await user.dm_channel.send(f"**Hey** {user.mention} **! Vous vous êtes warn sur {guild} :0 pour :** {reason} ")
     embed = discord.Embed(title="Warn", colour=000000())
-    embed.add_field(name=f"Raison du warn :", value=(reason))
-    embed.add_field(name=f"Par :", value=(par))
+    embed.add_field(title="Victime :", value=f"{user.name}")
+    embed.add_field(name=f"Raison du warn :", value=f("reason"))
+    embed.add_field(name=f"Par :", value=f("par"))
     await ctx.send(embed=embed)
     print("Une personne a été warn")
+
+@client.command()
+@commands.has_permissions(ban_members=True)
+async def add_blacklist(ctx, user: str, id:int):
+     with open('blacklist.json', 'r')as f:
+        blacklist = json.load(f)
+
+        blacklist[str(user)] = [id]
+        with open('blacklist.json', 'w')as f:
+            json.dump(blacklist, f, indent=4)
+
+        await ctx.send(f"L'utilisateur {user} avec l'id ``{id}`` a été ajouté à ma blacklist avec succès")
