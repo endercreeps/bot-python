@@ -1,20 +1,21 @@
-import time
-import discord
-import asyncio
-import aiohttp
-import json
-from discord import Game
-from discord.ext.commands import *
-from random import *
-from discord.ext import commands 
 from itertools import cycle
 import os
 from discord.ext.commands import Bot
 from discord.voice_client import VoiceClient
 import urllib.parse, urllib.request, re
 import random
+from discord.utils import get
+import sys
+import subprocess
+import traceback
+start_time = time.time()
 
+
+
+
+nb = 0
 x = 2
+boucle = 0
 
 def get_prefix(client,message):
     with open('prefixes.json', 'r')as f:
@@ -23,8 +24,23 @@ def get_prefix(client,message):
     return prefixes[str(message.guild.id)]
 
 client = commands.Bot(command_prefix=get_prefix)
-TOKEN = '#contact ender_creeps#4934'
+TOKEN = 'NTkwMjIzNjQ5ODE1MDAzMjAx.XchETg.si7Lg0DK3TdIDQAersHrBOII2Kg'
 extensions = ['fun']
+
+
+def get_blacklist(client, message):
+    with open('blacklist.json', 'r')as f:
+        blacklist = json.load(f)
+
+    return blacklist[str(id)]
+
+@client.event
+async def react(message):
+    for emoji in message.guild.emojis:
+        if emoji.name == "telephone":
+            await message.add_reaction(emoji)
+
+
 client.remove_command("help")
 os.chdir(r'C:\Users\coren\Documents\Bot resolve\PythonApplication1\PythonApplication1')
 i = 0
