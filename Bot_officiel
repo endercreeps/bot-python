@@ -6,21 +6,20 @@ from administration import *
 async def on_ready():
     print(f"{client.user.name} se lance")
     await client.change_presence(status=discord.Status.idle, activity=discord.Game("protéger mes serveurs | ,help"))
-    #await client.change_presence(game=Game(name="test"))
 
 @client.event
-async def on_member_join(member):
-    channel = discord.utils.get(member.guild.channels, name="‹🐾›-welcome")
-    #channel_règle = discord.utils.get(member.guild.channels, name="📰-règles")
-    await channel.send(f"**Bienvenue** {member.mention} :tada::wave:   **Bienvenue sur le serveur !!!**")
-    await user.create_dm()
-    await user.dm_channel.send(f"**Bienvenue** {member.mention} **Bienvenue sur le serveur !!! Pense a regarder les règles et a cocher la réaction pour avoir accès au reste du serveur  ;)**  ")
-    print("Une personne est arrivé")
+async def on_member_join(user=discord.User):
+    with open('blacklist.json', 'r')as f:
+        blacklist = json.load(f)
+        for user.id in blacklist['id']:
+            if user.id == user['id']:
+                await user.ban()
+                await client.send(f"La blacklist a ban {user.name}")
+            else:
+                print("Une personne est arrivé")
 
 @client.event
 async def on_member_remove(member):
-    channel = discord.utils.get(member.guild.channels, name="‹🐾›-welcome")
-    await channel.send(f"{member.mention}**a quitté le serveur :cry: aurevoir !**")
     print("Une personne est partie")
 
 @client.event
@@ -63,33 +62,55 @@ async def help(ctx, member: discord.Member=None):
 
     embed = discord.Embed(title="Help",description="Commande d'aide", colour=discord.Color.dark_blue())
 
+    embed.add_field(name="``,hadmin``", value="Affiche les commande de modération ")
     embed.add_field(name="``,ping``", value="Permet de vérifier si le bot est connecté ou non")
     embed.add_field(name="``,serveur``", value="Affiche des information sur le serveur")
     embed.add_field(name="``,8ball``", value="Posez une question au bot et il vous répondra par oui ou par non")
+    embed.add_field(name="``,bingo``", value="rentrer une valeur et trouver le nombre mystère")
     embed.add_field(name="``,addition``", value="Effectue une addition de 2 nombres")
     embed.add_field(name="``,soustraction``", value="Effectue une soustraction de 2 nombres")
     embed.add_field(name="``,multiplication``", value="Effectue une multiplication de 2 nombres")
     embed.add_field(name="``,division``", value="Effectue une division de 2 nombres")
+
+    await ctx.send(author, embed=embed)
+
+    embed = discord.Embed(title="Help Admin",description="Commande d'aide admin", colour=discord.Color.dark_blue())
+
     embed.add_field(name="**Commande de modération**", value="Commande accesible uniquement pour les modérateurs du serveur")
     embed.add_field(name="``,kick``", value="Exclue une personne du serveur")
     embed.add_field(name="``,ban``", value="Ban une personne  du serveur")
     embed.add_field(name="``,mute``", value="Empéche un membre de parler")
     embed.add_field(name="``,unmute``", value="Le membre qui c'est pris un mute peux maintenant re-parler dans le serveur")
-    embed.add_field(name="``,clear``", value="Permet de supprimer **5 messages**")
+    embed.add_field(name="``,clear``", value="Permet de supprimer le nombre de message que vous-voulez")
     embed.add_field(name="``,warn``", value="Avertis un utilisateur")
-    embed.add_field(name="``,warnings``", value="Affiche le nombre et le/les raison(s) du/des warn(s) d'un utilisateurs (si il n'en a pas cela affiche que cette utilisateur n'a pas d'utilisateur")
-    embed.add_field(name="``,changeprefix``", value="Permet de changer mon préfix (Au départ, c'ets la virgule (``,``))")
-    embed.add_field(name="``,logout``", value="Permet d'éteindre le bot /!\ ender_creeps#4934 est le seul a pouvoir le faire")
-    await ctx.send(author, embed=embed)
+    embed.add_field(name="``,warnings``", value="Affiche le nombre et le/les raison(s) du/des warn(s) d'un utilisateurs (si il n'en a pas cela affiche que cette utilisateur n'a pas d'utilisateur.")
+    embed.add_field(name="``,changeprefix``", value="Permet de changer mon préfix (Au départ, c'ets la virgule (``,``)).")
+    embed.add_field(name="``,say``", value="Permet de faire parler le bot.")
+    embed.add_field(name="``,say_embed``", value="Permet de faire parler le bot avec un embed")
+    embed.add_field(name="``,patchnote``", value="Permet d'annoncer des mises à jour avec un embed")
+    embed.add_field(name="``,logout``", value="Permet d'éteindre le bot /!\ ender_creeps#4934 est le seul a pouvoir le faire.")
+
+    await ctx.send(embed=embed)
+
+@client.command()
+async def ender_protec(ctx):
+    embed = discord.Embed(title="Bot @Ender_Protec",description="Détail ", colour=discord.Color.dark_blue())
+
+    embed.add_field(name="Je suis un bot discord en python dévellopé par :", value="ender_creeps#4934")
+    embed.add_field(name="Je suis avant tout un bot de modération", value="Pour voir mes commandes, taper ``,help`` et pour les commandes admin, taper ``,hadmin``")
+
+
 
 @client.command(pass_context=True)
-@commands.has_role('14062005#4934')
 async def logout(ctx, member: discord.Member=None):
-    await ctx.send("**Extinction du bot dans 5 secondes**")
-    await asyncio.sleep(5)
-    await ctx.send("**Bot éteint**")
-    await asyncio.sleep(1)
-    await client.logout()
+    if ctx.message.author.id == 361495885760167947:
+        await ctx.send("**Extinction du bot dans 5 secondes**")
+        await asyncio.sleep(5)
+        await ctx.send("**Bot éteint**")
+        await asyncio.sleep(1)
+        await client.logout()
+    else:
+        await ctx.send("Vous ne pouver pas faire ceci")
 
 @client.command()
 async def ping(ctx, member: discord.Member=None):
@@ -127,7 +148,7 @@ async def eight_ball(ctx):
     await ctx.send(random.choice(possible_responses) + ", " + ctx.message.author.mention)
 
 @client.command()
-async def serveur(ctx):
+async def serveur(ctx, user):
     embed = discord.Embed(title=f"{ctx.guild.name}", color=discord.Color.blue())
     embed.add_field(name="**Serveur créer le :**", value=f"``{ctx.guild.created_at}``")
     embed.add_field(name="**Chef du serveur :**", value=f"``{ctx.guild.owner}``")
@@ -135,9 +156,63 @@ async def serveur(ctx):
     embed.add_field(name="**Id du serveur :**", value=f"``{ctx.guild.id}``")
     embed.add_field(name="**Nombre de personne sur le serveur :**", value=f"``{len(ctx.guild.members)}``")
     embed.add_field(name="**Nombre de roles sur le serveur :**", value=f"``{len(ctx.guild.roles)}``")
+    #embed.add_field(name="**Date de ton arrivé sur le serveur :**", value=f"{user.guild.joined_at}")
+    #embed.add_field(name="**A quoi tu joue en ce moment**", value=f"{user.activities}")
+    #embed.add_field(name="****", value=f"{}")
     #embed.add_field(name="**Role du serveur :**", value=f"``{ctx.guild.roles}``")
     #embed.set_thumbnail(url=f"ctx.guild.icon_url")
     await ctx.send(embed=embed)
+
+@client.command()
+async def bingo(ctx, num1 : int):
+    if not num1:
+        embed = discord.Embed(title="Bingo Erreur", colour=discord.Color.dark_blue())
+        embed.add_field(name=f"Erreur :", value=f"Vous devez indiquer un chiffre après la commande ") 
+        await ctx.send(embed=embed)
+    else:
+        nb = random.randint(1,num1)
+        essaie = 0
+        print(nb)
+        embed = discord.Embed(title="Bingo", colour=discord.Color.dark_blue())
+        embed.add_field(name=f"Bingo lancé", value=f"Le nombre a trouvé est entre 1 et {num1}") 
+        await ctx.send(embed=embed)
+        while boucle == 0:
+            message = await client.wait_for('message')
+            jsp = message.content
+            nombre = int(jsp)
+            if nombre == nb:
+                par = ctx.author.mention
+                par2 = ctx.message.author.mention
+                embed = discord.Embed(title="Bingo", colour=discord.Color.dark_blue())
+                embed.add_field(name="Bingo gagné", value=f"Le nombre a été trouvé par {par} !")
+                embed.add_field(name="La réponse était :", value=f"{nb}")
+                embed.add_field(name=f"Tu a trouvé le nombre mystère en :", value=f"{essaie} essaies")
+                await ctx.send(embed=embed)
+                break
+
+            if nombre > nb:
+                await ctx.send("C'est plus petit")
+                essaie += 1
+            elif nombre < nb:
+                await ctx.send("C'est plus grand !")
+                essaie +=1
+
+@client.command()
+@commands.has_permissions(manage_messages=True)
+async def sondage(ctx, *, question : str):
+     if not question:
+        embed = discord.Embed(title="Patch Note Erreur", colour=discord.Color.dark_blue())
+        embed.add_field(name=f"Erreur :", value=f"Vous devez indiquer 1 message après la commande ")
+        await ctx.send(embed=embed)
+     else:
+        await ctx.channel.purge(limit=1)
+        emojioui = get(ctx.message.guild.emojis, name="emoji3")
+        emojinon = get(ctx.message.guild.emojis, name="emoji4")
+        embed = discord.Embed(title="Sondage", colour=discord.Color.dark_blue())
+        embed.add_field(name=f"**{question}**", value=f"Oui {emojioui} / Non {emojinon}")                                             
+        msg = await ctx.send(embed=embed)
+        await msg.add_reaction(f"{emojioui}")
+        await msg.add_reaction(f"{emojinon}")
 
 @client.command()
 async def invite(ctx):
@@ -158,33 +233,157 @@ async def youtube(ctx, *, search):
 
 @client.command()
 async def multiplication(ctx, num1: int, num2: int):
+    if not num1 or num2:
+        embed = discord.Embed(title="Multiplication Erreur", colour=discord.Color.dark_blue())
+        embed.add_field(name=f"Erreur :", value=f"Vous devez indiquer 2 chiffres après la commande ")
+        await ctx.send(embed=embed)
     #result = num1 * num2
-    embed = discord.Embed(title="Multiplication", colour=discord.Color.dark_blue())
-    embed.add_field(name="**Calcul**", value=f"``{num1} x {num2}``")
-    embed.add_field(name="**Résultat**", value=f"``{num1 * num2}``")
-    await ctx.send(embed = embed)
+    else:
+        embed = discord.Embed(title="Multiplication", colour=discord.Color.dark_blue())
+        embed.add_field(name="**Calcul**", value=f"``{num1} x {num2}``")
+        embed.add_field(name="**Résultat**", value=f"``{num1 * num2}``")
+        await ctx.send(embed = embed)
 
 @client.command()
 async def division(ctx, num1: int, num2: int):
-    embed = discord.Embed(title="Division", colour=discord.Color.dark_blue())
-    embed.add_field(name="**Calcul**", value=f"``{num1} ÷ {num2}``")
-    embed.add_field(name="**Résultat**", value=f"``{num1 / num2}``")
-    await ctx.send(embed = embed)
+    if not num1 or num2:
+        embed = discord.Embed(title="Division Erreur", colour=discord.Color.dark_blue())
+        embed.add_field(name=f"Erreur :", value=f"Vous devez indiquer 2 chiffres après la commande ")
+        await ctx.send(embed=embed)
+    else:
+        embed = discord.Embed(title="Division", colour=discord.Color.dark_blue())
+        embed.add_field(name="**Calcul**", value=f"``{num1} ÷ {num2}``")
+        embed.add_field(name="**Résultat**", value=f"``{num1 / num2}``")
+        await ctx.send(embed = embed)
 
 @client.command()
 async def soustraction(ctx, num1: int, num2: int):
-    embed = discord.Embed(title="Soustraction", colour=discord.Color.dark_blue())
-    embed.add_field(name="**Calcul**", value=f"``{num1} - {num2}``")
-    embed.add_field(name="**Résultat**", value=f"``{num1 - num2}``")
-    await ctx.send(embed = embed)
+    if not num1 or num2:
+        embed = discord.Embed(title="Soustraction Erreur", colour=discord.Color.dark_blue())
+        embed.add_field(name=f"Erreur :", value=f"Vous devez indiquer 2 chiffres après la commande ")
+        await ctx.send(embed=embed)
+    else:
+        embed = discord.Embed(title="Soustraction", colour=discord.Color.dark_blue())
+        embed.add_field(name="**Calcul**", value=f"``{num1} - {num2}``")
+        embed.add_field(name="**Résultat**", value=f"``{num1 - num2}``")
+        await ctx.send(embed = embed)
 
 @client.command()
 async def addition(ctx, num1: int, num2: int):
-    #result = num1 * num2
-    embed = discord.Embed(title="Addition", colour=discord.Color.dark_blue())
-    embed.add_field(name="**Calcul**", value=f"``{num1} + {num2}``")
-    embed.add_field(name="**Résultat**", value=f"``{num1 + num2}``")
-    await ctx.send(embed = embed)
+    if not num1 or num2:
+        embed = discord.Embed(title="Addition Erreur", colour=discord.Color.dark_blue())
+        embed.add_field(name=f"Erreur :", value=f"Vous devez indiquer 2 chiffres après la commande ")
+        await ctx.send(embed=embed)
+    else:
+        embed = discord.Embed(title="Addition", colour=discord.Color.dark_blue())
+        embed.add_field(name="**Calcul**", value=f"``{num1} + {num2}``")
+        embed.add_field(name="**Résultat**", value=f"``{num1 + num2}``")
+        await ctx.send(embed = embed)
+
+#@client.event
+#async def on_message(message):
+ #   if message.author == client.user:
+  #      return
+
+   # if "discord.gg" in message.content.lower():
+    #  await message.delete()
+     #  await message.channel.send("**Merci de ne pas mettre de pub !**") 
+     #  print("Une personne a essayer de mettre de la pub")
+     #  await client.process_commands(message)
     
+    #if message.content.startswith("bonjour"):
+      #  await message.channel.send('**Salutation** {0.author.mention}'.format(message))
+
+@client.command()
+async def ticket(ctx):
+    await ctx.channel.purge(limit=1)
+    emoji = get(ctx.message.guild.emojis, name="emoji1")
+    embed=discord.Embed(title="Tickets", colour=discord.Color.dark_blue())
+    embed.add_field(name=f"**Vous avez trouvez un bug ? Une faute d'orthographe ? Vous avez une question ? Et bien je vous laisse appuier sur la réaction {emoji} et cela vous ouvrira un ticket**", value=f"{emoji}")
+    if ctx.channel.id == 640503543828316199 or 643170237520412701:
+        msg = await ctx.send(embed=embed)
+        await msg.add_reaction(f"{emoji}")
+    else:
+        await ctx.send(f"**{ctx.author.mention}, Vous n'avez pas le droit d'effectuer cet commande ici.**")
+        time.sleep(2)
+        await ctx.channel.purge(limit=1)
+
+
+@client.command(pass_context = True)
+@commands.has_permissions(manage_messages=True)
+async def say(ctx, *, message : str):
+    if not message:
+        embed = discord.Embed(title="Say Erreur", colour=discord.Color.dark_blue())
+        embed.add_field(name=f"Erreur :", value=f"Vous devez indiquer 1 message après la commande ")
+        await ctx.send(embed=embed)
+    else:
+        par = ctx.author.name
+        await ctx.channel.purge(limit=1)
+        await ctx.send(message)
+        print(message)
+        print(par)
+        return
+    
+
+@client.command(pass_context = True)
+@commands.has_permissions(manage_messages=True)
+async def say_embed(ctx, *, message : str):
+    if not message:
+        embed = discord.Embed(title="Say_embed Erreur", colour=discord.Color.dark_blue())
+        embed.add_field(name=f"Erreur :", value=f"Vous devez indiquer 1 message après la commande ")
+        await ctx.send(embed=embed)
+    else:
+        await ctx.channel.purge(limit=1)
+        par = ctx.author.name
+        embed=discord.Embed(title=f"Message", colour=discord.Color.dark_blue())
+        embed.add_field(name=f"Message de {par} ", value=f"{message}")
+        await ctx.send(embed=embed)
+        print(message)
+        print(par)
+        return
+
+@client.command(pass_context = True)
+@commands.has_permissions(administrator=True)
+async def patchnote(ctx, *, message : str):
+    if not message:
+        embed = discord.Embed(title="Patch Note Erreur", colour=discord.Color.dark_blue())
+        embed.add_field(name=f"Erreur :", value=f"Vous devez indiquer 1 message après la commande ")
+        await ctx.send(embed=embed)
+    else:
+        await ctx.channel.purge(limit=1)
+        par = ctx.author.name
+        embed=discord.Embed(title=f"Patch Note", colour=discord.Color.dark_blue())
+        embed.add_field(name=f"Ajoute de :", value=f"{message}")
+        await ctx.send(embed=embed)
+        return
+
+@client.event
+async def on_reaction_add(reaction, user: discord.Member):
+    channel = reaction.message.channel
+    category = discord.utils.get(user.guild.categories, name="⏫ Aide Bot ⏫") 
+    if channel.id == 640503543828316199:
+        if user.id == client.user.id:
+            return
+        else:
+            #await user.remove.reaction(":telephone:")
+            guild = user.guild
+            #role_mute = discord.utils.get(user.guild.roles, name="Muted")
+            #role = await client.create.role(f"Ticket {user.name}")
+            #ticket_role = discord.utils.get(user.guild.roles, name=role)
+            #await user.add_roles(ticket_role)
+            overwrites = {guild.default_role: discord.PermissionOverwrite(read_messages=False),
+                          #role_mute : discord.PermissionOverwrite(read_messages=False, send_messages=False),
+                          user: discord.PermissionOverwrite(read_messages=True, send_messages=True)
+                         }
+
+
+            channel = await guild.create_text_channel(f"{user.name} ticket", category = category, overwrites = overwrites)
+            #emoji = get(ctx.message.guild.emojis, name="emoji2")
+            msg = await channel.send(f"**Bonjour {user.mention} je vous laisse poser une question ou bien dire quel est votre problème** (ATTENTION AU TROLL, ILS SERONT SANCTIONNÉ !)")
+            #await msg.add_reaction(f"{emoji}")
+
+
+
+
+
 client.run(TOKEN)
-   
