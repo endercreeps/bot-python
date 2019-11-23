@@ -40,22 +40,18 @@ async def eight_ball(ctx):
     ] 
     await ctx.send(f"{ctx.author.mention}{random.choice(possibles_reponses)})
 @commands.command()
-async def serveur(self, ctx, user):
-    embed = discord.Embed(title=f"{ctx.guild.name}", color=discord.Color.blue())
-    embed.add_field(name="**Serveur crée le :**", value=f"``{ctx.guild.created_at}``")
-    embed.add_field(name="**Créateur du serveur :**", value=f"``{ctx.guild.owner}``")
-    embed.add_field(name="**Région du serveur :**", value=f"``{ctx.guild.region}``")
-    embed.add_field(name="**Id du serveur :**", value=f"``{ctx.guild.id}``")
-    embed.add_field(name="**Nombre de personnes sur le serveur :**", value=f"``{len(ctx.guild.members)}``")
-    roles = ctx.guild.roles
-    for role in roles:
-                   embed.add_field(name="**Nombre de roles sur le serveur :**", value=")
-    #embed.add_field(name="**Date de ton arrivé sur le serveur :**", value=f"{user.guild.joined_at}")
-    #embed.add_field(name="**A quoi tu joue en ce moment**", value=f"{user.activities}")
-    #embed.add_field(name="****", value=f"{}")
-    embed.add_field(name= Roles du serveur :, value=f"``{ctx.guild.roles}``")
-    embed.set_thumbnail(url=f"ctx.message.guild.avatar_url")
-    await ctx.send(embed=embed)
+async def serveur(self, ctx):
+  	embed = discord.Embed(title=f"{ctx.guild.name}", color=discord.Color.blue())
+  	embed.add_field(name="Serveur crée le :", value= ctx.guild.created_at)
+  	embed.add_field(name="Créateur du serveur :", value= ctx.guild.owner)
+  	embed.add_field(name="Région du serveur :", value=ctx.guild.region )
+  	embed.add_field(name="Id du serveur :", value= ctx.guild.id)
+  	embed.add_field(name="Nombre de personnes sur le serveur :",value=f"{len(ctx.guild.members)})
+  	roles = ctx.guild.roles
+  	for role in roles:
+  		embed.add_field(name= "Roles du serveur", value= role )
+  	await ctx.send(embed=embed)
+
 
 @client.command()
 async def bingo(ctx, num1 : int):
