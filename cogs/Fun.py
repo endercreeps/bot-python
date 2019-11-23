@@ -15,10 +15,8 @@ class fun(commmands.Cog):
     await ctx.send(author, embed=embed)
 
 @commands.command(name='8ball',
-                description="Répond a une question par oui ou par non",
-                aliases=['eight_ball', 'eightball', '8-ball'],
-                pass_context=True)
-async def eight_ball(ctx):
+                description="Répond a une question par oui ou par non")
+async def eight_ball(self,ctx):
     possible_responses = [
         "C'est un non retentissant",
         "Ce n'est pas probable",
@@ -38,7 +36,7 @@ async def eight_ball(ctx):
         "Aucun doute possible",
         "Je pense que oui",
     ] 
-    await ctx.send(f"{ctx.author.mention}{random.choice(possibles_reponses)})
+    await ctx.send(f"{random.choice(possibles_reponses)}, {ctx.author.mention}")
 @commands.command()
 async def serveur(self, ctx):
   	embed = discord.Embed(title=f"{ctx.guild.name}", color=discord.Color.blue())
