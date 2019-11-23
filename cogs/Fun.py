@@ -47,6 +47,7 @@ async def serveur(self, ctx):
   	embed.add_field(name="Région du serveur :", value=ctx.guild.region )
   	embed.add_field(name="Id du serveur :", value= ctx.guild.id)
   	embed.add_field(name="Nombre de personnes sur le serveur :",value=f"{len(ctx.guild.members)})
+    embed.set_thumbnail(url =ctx.guild.icon_url)
   	roles = ctx.guild.roles
   	for role in roles:
   		embed.add_field(name= "Roles du serveur", value= role )
