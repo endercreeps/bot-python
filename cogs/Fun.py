@@ -50,38 +50,31 @@ async def serveur(self, ctx):
   	for role in roles:
   		embed.add_field(name= "Roles du serveur", value= role )
   	await ctx.send(embed=embed)
+	@commands.command()
+	async def bingo(self,ctx, numb1: int):
+		nb = random.randint(1,numb1)
+		essaie = 0
+		print(nb)
+		embed = discord.Embed(color = discord.Color.dark_blue(), title = "BINGO lancé !", description = f"Le nombre a trouvé est entre 1 et {numb1}.\nBonne chance !")
+		await ctx.send(embed=embed)
+		while True:
+			def check(si):
+				return si.author == ctx.message.author
+			message1 = await self.bot.wait_for('message', check = check)
+			msg = int(message1.content)
+			if msg == nb:
+				embed = discord.Embed(title="Bingo gagné !",description = f"le nombre a été retrouvé par **{ctx.message.author}**.\n Le nombre a trouvé était: **{nb}**.\n{ctx.message.author} a retrouvé le nombre mystère en: **{essaie}** essaies.", colour=discord.Color.dark_blue())
+				await ctx.send(embed=embed)
+				break
+			if msg > nb:
+				await ctx.send("C'est plus petit !")
+				essaie += 1 
+			elif msg < nb:
+				await ctx.send("C'est plus grand !")
+				essaie +=1
+	@bingo.error
+	async def error(self, ctx, error):
+		if isinstance(error, commands.MissingRequiredArgument):
+			embed = discord.Embed(title="Bingo Erreur",description = "vous devez indiquer un nombre ou un chiffre après la commande. " ,colour=discord.Color.red())
+			await ctx.send(embed=embed)
 
-
-@client.command()
-async def bingo(ctx, num1 : int):
-    if not num1:
-        embed = discord.Embed(title="Bingo Erreur", colour=discord.Color.dark_blue())
-        embed.add_field(name=f"Erreur :", value=f"Vous devez indiquer un chiffre après la commande ") 
-        await ctx.send(embed=embed)
-    else:
-        nb = random.randint(1,num1)
-        essaie = 0
-        print(nb)
-        embed = discord.Embed(title="Bingo", colour=discord.Color.dark_blue())
-        embed.add_field(name=f"Bingo lancé", value=f"Le nombre a trouvé est entre 1 et {num1}") 
-        await ctx.send(embed=embed)
-        while boucle == 0:
-            message = await client.wait_for('message')
-            jsp = message.content
-            nombre = int(jsp)
-            if nombre == nb:
-                par = ctx.author.mention
-                par2 = ctx.message.author.mention
-                embed = discord.Embed(title="Bingo", colour=discord.Color.dark_blue())
-                embed.add_field(name="Bingo gagné", value=f"Le nombre a été trouvé par {par} !")
-                embed.add_field(name="La réponse était :", value=f"{nb}")
-                embed.add_field(name=f"Tu a trouvé le nombre mystère en :", value=f"{essaie} essaies")
-                await ctx.send(embed=embed)
-                break
-
-            if nombre > nb:
-                await ctx.send("C'est plus petit")
-                essaie += 1
-            elif nombre < nb:
-                await ctx.send("C'est plus grand !")
-                essaie +=1
