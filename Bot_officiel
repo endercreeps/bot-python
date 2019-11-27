@@ -163,56 +163,6 @@ async def serveur(ctx, user):
     #embed.set_thumbnail(url=f"ctx.guild.icon_url")
     await ctx.send(embed=embed)
 
-@client.command()
-async def bingo(ctx, num1 : int):
-    if not num1:
-        embed = discord.Embed(title="Bingo Erreur", colour=discord.Color.dark_blue())
-        embed.add_field(name=f"Erreur :", value=f"Vous devez indiquer un chiffre après la commande ") 
-        await ctx.send(embed=embed)
-    else:
-        nb = random.randint(1,num1)
-        essaie = 0
-        print(nb)
-        embed = discord.Embed(title="Bingo", colour=discord.Color.dark_blue())
-        embed.add_field(name=f"Bingo lancé", value=f"Le nombre a trouvé est entre 1 et {num1}") 
-        await ctx.send(embed=embed)
-        while boucle == 0:
-            message = await client.wait_for('message')
-            jsp = message.content
-            nombre = int(jsp)
-            if nombre == nb:
-                par = ctx.author.mention
-                par2 = ctx.message.author.mention
-                embed = discord.Embed(title="Bingo", colour=discord.Color.dark_blue())
-                embed.add_field(name="Bingo gagné", value=f"Le nombre a été trouvé par {par} !")
-                embed.add_field(name="La réponse était :", value=f"{nb}")
-                embed.add_field(name=f"Tu a trouvé le nombre mystère en :", value=f"{essaie} essaies")
-                await ctx.send(embed=embed)
-                break
-
-            if nombre > nb:
-                await ctx.send("C'est plus petit")
-                essaie += 1
-            elif nombre < nb:
-                await ctx.send("C'est plus grand !")
-                essaie +=1
-
-@client.command()
-@commands.has_permissions(manage_messages=True)
-async def sondage(ctx, *, question : str):
-     if not question:
-        embed = discord.Embed(title="Patch Note Erreur", colour=discord.Color.dark_blue())
-        embed.add_field(name=f"Erreur :", value=f"Vous devez indiquer 1 message après la commande ")
-        await ctx.send(embed=embed)
-     else:
-        await ctx.channel.purge(limit=1)
-        emojioui = get(ctx.message.guild.emojis, name="emoji3")
-        emojinon = get(ctx.message.guild.emojis, name="emoji4")
-        embed = discord.Embed(title="Sondage", colour=discord.Color.dark_blue())
-        embed.add_field(name=f"**{question}**", value=f"Oui {emojioui} / Non {emojinon}")                                             
-        msg = await ctx.send(embed=embed)
-        await msg.add_reaction(f"{emojioui}")
-        await msg.add_reaction(f"{emojinon}")
 
 @client.command()
 async def invite(ctx):
