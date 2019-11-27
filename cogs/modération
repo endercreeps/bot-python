@@ -1,1 +1,7 @@
+import discord 
+from discord.ext import commands
+import random 
 
+class modération(commmands.Cog):
+  def __init__(self, bot):
+    self.bot = bot
